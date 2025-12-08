@@ -1,0 +1,37 @@
+<div class="board">
+
+  <div class="small">Mot du jour • {{ wordOfDay.date }}</div>
+  <div style="height:12px"></div>
+
+  <!-- Tentatives précédentes -->
+  @for (a of attempts; track $index) {
+  <div class="row">
+    @for (c of getLetters(a); let i = $index; track i) {
+    <span class="cell" [class]="getColor(a, i)">
+      {{ c }}
+    </span>
+    }
+
+  </div>
+  <!-- <span class="result small">{{ a.result }}</span> -->
+  }
+
+  <!-- Tentative en cours -->
+  <div class="row current">
+    @for (letter of wordOfDay.word.split(''); track $index) {
+    <span class="cell">
+      {{ guess[$index] || '' }}
+    </span>
+    }
+  </div>
+
+  <button (click)="submit()" [disabled]="guess.length !== wordOfDay.word.length">
+    Proposer
+  </button>
+
+  @if (attempts.length >= maxGuesses && !isLastCorrect()) {
+  <div class="small answer">
+    Plus de tentatives disponibles. Le mot était: {{ wordOfDay.word }}
+  </div>
+  }
+</div>

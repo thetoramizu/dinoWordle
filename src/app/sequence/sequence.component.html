@@ -1,0 +1,13 @@
+<ul>
+  @for (s of seq; track s.date) {
+    <li>
+      <strong>{{ s.date }}</strong> — {{ s.word }} —
+
+      @if (isFound(s.date)) {
+        <span>✅ trouvé</span>
+      } @else {
+        <span>❌ non trouvé</span>
+      }
+    </li>
+  }
+</ul>
