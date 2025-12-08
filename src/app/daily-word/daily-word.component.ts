@@ -23,7 +23,7 @@ import { ClavierVirtuelComponent } from '../clavier-virtuel/clavier-virtuel.comp
   styleUrl: './daily-word.component.scss',
 })
 export class DailyWordComponent implements AfterViewInit {
-  guess = '';
+  // guess = '';
   maxGuesses = 5;
 
   firstLetter = '';
@@ -66,39 +66,37 @@ export class DailyWordComponent implements AfterViewInit {
     });
   }
 
-  @HostListener('window:keydown', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    const key = event.key.toUpperCase();
-    const wordLength = this.ws.wordOfDaySignal()?.word.length || 0;
-    const maxTyped = wordLength - 1; // on tape à partir de la 2ᵉ lettre
+@HostListener('window:keydown', ['$event'])
+handleKeyboardEvent(event: KeyboardEvent) {
+  const key = event.key.toUpperCase();
+  const wordLength = this.ws.wordOfDaySignal()?.word.length || 0;
+  const maxTyped = wordLength - 1;
 
-    // Touche Enter → submit si le mot est complet
-    if (key === 'ENTER') {
-      if (this.fullGuess.length === wordLength) {
-        this.submit();
-      }
-      event.preventDefault();
-      return;
+  if (key === 'ENTER') {
+    if (this.fullGuess.length === wordLength) this.submit();
+    event.preventDefault();
+    return;
+  }
+
+  if (key === 'BACKSPACE') {
+    if (this.typed.length > 0) this.typed = this.typed.slice(0, -1);
+    event.preventDefault();
+    return;
+  }
+
+  if (/^[A-Z]$/.test(key)) {
+    if (this.typed.length < maxTyped) {
+      this.typed += key;
     }
+  }
+}
 
-    // Suppression
-    if (key === 'BACKSPACE') {
-      if (this.typed.length > 1) {
-        this.typed = this.guess.slice(0, -1); // empêche de supprimer la première lettre
-      }
-      return;
-    }
+  private syncHiddenInput() {
+    const el = this.hiddenInput()?.nativeElement;
+    if (!el) return;
 
-    // Ignorer si mot complet
-    if (this.guess.length >= this.ws.wordOfDaySignal()!.word.length) return;
-
-    // Autoriser uniquement les lettres A-Z
-    if (/^[A-Z]$/.test(key)) {
-      const maxLength = this.ws.wordOfDaySignal()!.word.length;
-      if (this.typed.length < maxTyped) {
-        this.guess += key;
-      }
-    }
+    el.value = this.firstLetter + this.typed;
+    el.focus();
   }
 
   ngAfterViewInit() {
@@ -204,40 +202,51 @@ export class DailyWordComponent implements AfterViewInit {
     this.keyboardStates.set(states);
   }
 
-  // Gestion des touches du clavier virtuel
   handleVirtualKey(key: string) {
     const wordSignal = this.ws.wordOfDaySignal();
     if (!wordSignal) return;
+
     const maxTyped = wordSignal.word.length - 1;
 
     if (key === 'Enter') {
       if (this.fullGuess.length === wordSignal.word.length) this.submit();
     } else if (key === 'Backspace') {
-      if (this.typed.length > 0) this.typed = this.typed.slice(0, -1);
+      if (this.typed.length > 0) {
+        this.typed = this.typed.slice(0, -1);
+      }
     } else if (/^[A-Z]$/.test(key)) {
       if (this.typed.length < maxTyped) {
         this.typed += key;
-        this.focusInput();
       }
     }
+
+    this.syncHiddenInput();
   }
 
-  onHiddenInput(event: Event) {
-    const input = event.target as HTMLInputElement;
+onHiddenInput(event: Event) {
+  const input = event.target as HTMLInputElement;
 
-    let value = input.value.toUpperCase();
+  const raw = input.value.replace(/[^A-Za-z]/g, '').toUpperCase();
 
-    // La première lettre est toujours fixed
-    if (!value.startsWith(this.firstLetter)) {
-      value = this.firstLetter + value.replace(/[^A-Z]/g, '').slice(0);
-    }
+  // Détermine la partie tapée
+  const withoutFirst = raw.startsWith(this.firstLetter)
+      ? raw.slice(1)
+      : raw;
 
-    const max = this.ws.wordOfDaySignal()!.word.length - 1;
+  const max = this.ws.wordOfDaySignal()!.word.length - 1;
 
-    // typed = tout sauf la première lettre
-    this.typed = value.slice(1).slice(0, max);
+  this.typed = withoutFirst.slice(0, max);
 
-    // Mise à jour de la valeur de l’input pour rester cohérent
-    input.value = this.firstLetter + this.typed;
+  // met à jour l'input sans créer de boucle
+  input.value = this.firstLetter + this.typed;
+}
+
+  onBlurHiddenInput() {
+    // On reprend le focus immédiatement
+    this.focusHiddenInput();
+  }
+
+  focusHiddenInput() {
+    setTimeout(() => this.hiddenInput()?.nativeElement.focus(), 10);
   }
 }

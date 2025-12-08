@@ -9,7 +9,7 @@ body {
 .app {
   max-width: 600px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 24px 0;
 }
 
 h1 {
@@ -22,16 +22,21 @@ h1 {
   -webkit-text-fill-color: transparent;
 }
 
-/* CARDS MODERNES */
-.card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-  backdrop-filter: blur(4px);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.daily {
+  margin-bottom: 8px;
 }
 
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  margin-bottom: 16px; /* Ajouté */
+}
+
+.card:last-child {
+  margin-bottom: 0;
+}
 /* Animation hover (désactivée sur mobile pour éviter le flash) */
 @media (hover: hover) {
   .card:hover {

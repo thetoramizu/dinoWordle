@@ -57,7 +57,11 @@
 
 <input
   #hiddenInput
-  class="hidden-input"
   type="text"
+  autocomplete="off"
+  autocorrect="off"
+  spellcheck="false"
+  class="hidden-input"
+  (blur)="onBlurHiddenInput()"
   (input)="onHiddenInput($event)"
 />
