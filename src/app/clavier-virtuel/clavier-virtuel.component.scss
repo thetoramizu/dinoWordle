@@ -12,33 +12,50 @@
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 4px;
-  flex-wrap: wrap;
+  gap: 3px;          /* réduit le gap pour tenir sur mobile */
+  flex-wrap: nowrap;  /* empêche les touches de passer à la ligne */
+  overflow-x: auto;   /* permet de scroller horizontalement si nécessaire */
+  padding-bottom: 4px;
 }
 
 .key {
-  flex: 1 1 0;
-  min-width: 32px;
+  flex: 1 1 0;        /* largeur flexible */
+  min-width: 28px;    /* légèrement réduit pour mobile */
   max-width: 8vw;
-  height: 48px;
+  height: 44px;
   border-radius: 4px;
   border: 1px solid #555;
   text-transform: uppercase;
   font-weight: bold;
   cursor: pointer;
   box-sizing: border-box;
-  white-space: nowrap; /* empêche le texte de passer à la ligne */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Touches spéciales : Enter et Backspace */
+/* Touches spéciales */
 .key.Enter, .key.Backspace {
-  flex: 2 1 0;        /* elles prennent plus de place */
-  min-width: 60px;    /* minimum pour que le texte tienne */
+  flex: 2 1 0;       /* plus large */
+  min-width: 50px;   /* minimum pour le texte */
 }
 
 /* Couleurs */
 .key.green { background-color: #30b267; border-color: #30b267; color: white; }
 .key.yellow { background-color: #c8b450; border-color: #c8b450; color: white; }
 .key.gray { background-color: #5a5a5a; border-color: #5a5a5a; color: white; }
+
+/* Petits écrans */
+@media (max-width: 400px) {
+  .key {
+    font-size: 14px;
+    height: 40px;
+  }
+
+  .key.Enter, .key.Backspace {
+    min-width: 45px;
+  }
+}
