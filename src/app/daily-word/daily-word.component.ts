@@ -52,7 +52,6 @@ export class DailyWordComponent implements AfterViewInit {
   }
 
   constructor() {
-    const first = this.ws.wordOfDaySignal()?.word[0].toUpperCase() || 'S';
     const w = this.ws.wordOfDaySignal();
     if (w) {
       this.firstLetter = w.word[0].toUpperCase();

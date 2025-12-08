@@ -65,7 +65,7 @@ export class WordService {
     const days = this.daysSinceEpoch(date);
 
     // 2. Transformation simple pour “mélanger” un peu
-    const seed = (days * 9301 + 49297) % 233280; // constants arbitraires
+    const seed = (days * 9302 + 49297) % 233280; // constants arbitraires
 
     // 3. Index final dans le dictionnaire
     return seed % max;
