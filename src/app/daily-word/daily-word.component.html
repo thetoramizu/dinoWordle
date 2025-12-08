@@ -16,6 +16,7 @@
   <!-- <span class="result small">{{ a.result }}</span> -->
   }
 
+  @if(canAttempt()) {
   <!-- Tentative en cours -->
   <div class="row current">
     @for (letter of ws.wordOfDaySignal()!.word.split(''); let i = $index; track i) {
@@ -28,14 +29,13 @@
       {{ typed[i - 1] || '' }}
     </span>
     }
-
-
     }
   </div>
 
   <button (click)="submit()" [disabled]="fullGuess.length !== ws.wordOfDaySignal()!.word.length">
     Proposer
   </button>
+  }
 
   @if (attempts().length >= maxGuesses && !isLastCorrect()) {
   <div class="small answer">
@@ -52,15 +52,16 @@
 </div>
 
 
+@if (isLastCorrect() ) {
+
+  <div class="victory-message">
+    🎉 BRAVO ! Tu as trouvé le mot du jour !
+  </div>
+
+}
+
+
 <app-clavier-virtuel [letterStates]="keyboardStates()" (keyPress)="handleVirtualKey($event)"></app-clavier-virtuel>
 
 
-<input
-  #hiddenInput
-  type="text"
-  autocomplete="off"
-  autocorrect="off"
-  spellcheck="false"
-  class="hidden-input"
-  readonly
-/>
+<input #hiddenInput type="text" autocomplete="off" autocorrect="off" spellcheck="false" class="hidden-input" readonly />

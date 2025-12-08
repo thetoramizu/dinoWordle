@@ -84,3 +84,32 @@
   font-weight: bold;
   border: 2px solid #333;
 }
+
+
+.victory-message {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  background-color: #ffffff;         /* fond blanc */
+  color: #388e3c;                    /* vert doux pour victoire */
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid #c0c0c0;        /* bordure discrète */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* léger relief */
+}
+
+
+
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

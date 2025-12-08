@@ -47,6 +47,9 @@ export class DailyWordComponent implements AfterViewInit {
     return this.allAttempts()[this.ws.wordOfDaySignal()!.date] || [];
   });
 
+  canAttempt = computed(() =>
+    this.attempts().length < this.maxGuesses && !this.isLastCorrect()
+);
   get fullGuess() {
     return (this.firstLetter + this.typed).toUpperCase();
   }
@@ -190,8 +193,9 @@ private syncHiddenInput() {
   }
 
   isLastCorrect(): boolean {
-    if (!this.attempts.length) return false;
-    return this.attempts()[this.attempts.length - 1].result === 'correct';
+    const attemptsToday = this.attempts();
+    if (!attemptsToday.length) return false;
+    return attemptsToday[attemptsToday.length - 1].result === 'correct';
   }
 
   // Calcul automatique des états des lettres à partir des essais
