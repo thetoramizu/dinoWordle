@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AchievementsComponent } from "./achievements/achievements.component";
 import { SequenceComponent } from "./sequence/sequence.component";
 import { DailyWordComponent } from "./daily-word/daily-word.component";
 import { RouterOutlet } from "@angular/router";
+import { WordService } from './services/word.service';
 
 @Component({
   selector: 'app-root',
@@ -12,4 +13,10 @@ import { RouterOutlet } from "@angular/router";
 })
 export class AppComponent {
   title = 'DinoWordle';
+
+  private readonly ws = inject(WordService);
+
+  ngOnInit() {
+    this.ws.loadDictionary();
+  }
 }

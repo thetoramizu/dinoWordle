@@ -1,6 +1,6 @@
 <div class="board">
 
-  <div class="small">Mot du jour • {{ wordOfDay.date }}</div>
+  <div class="small">Mot du jour • {{ ws.wordOfDaySignal()!.date }}</div>
   <div style="height:12px"></div>
 
   <!-- Tentatives précédentes -->
@@ -18,20 +18,20 @@
 
   <!-- Tentative en cours -->
   <div class="row current">
-    @for (letter of wordOfDay.word.split(''); track $index) {
+    @for (letter of ws.wordOfDaySignal()!.word.split(''); track $index) {
     <span class="cell">
       {{ guess[$index] || '' }}
     </span>
     }
   </div>
 
-  <button (click)="submit()" [disabled]="guess.length !== wordOfDay.word.length">
+  <button (click)="submit()" [disabled]="guess.length !== ws.wordOfDaySignal()!.word.length">
     Proposer
   </button>
 
   @if (attempts.length >= maxGuesses && !isLastCorrect()) {
   <div class="small answer">
-    Plus de tentatives disponibles. Le mot était: {{ wordOfDay.word }}
+    Plus de tentatives disponibles. Le mot était: {{ ws.wordOfDaySignal()!.word }}
   </div>
   }
 </div>

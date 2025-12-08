@@ -1,4 +1,4 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { StorageService } from '../services/storage.service';
 import { StreakService } from '../services/streak.service';
 import { WordService } from '../services/word.service';
@@ -11,19 +11,18 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './daily-word.component.scss',
 })
 export class DailyWordComponent {
-  wordOfDay: any;
   guess = '';
   attempts: any[] = [];
   maxGuesses = 6;
 
-  private readonly ws = inject(WordService);
+  protected readonly ws = inject(WordService);
   private readonly storage = inject(StorageService);
   private readonly ss = inject(StreakService);
 
   ngOnInit() {
-    this.wordOfDay = this.ws.getWordOfDay();
+    this.ws.wordOfDaySignal();
     const allAttempts = this.storage.loadAttempts();
-    this.attempts = allAttempts[this.wordOfDay.date] || [];
+    this.attempts = allAttempts[this.ws.wordOfDaySignal()!.date] || [];
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -37,7 +36,7 @@ export class DailyWordComponent {
     }
 
     // Ignorer si mot complet
-    if (this.guess.length >= this.wordOfDay.word.length) return;
+    if (this.guess.length >= this.ws.wordOfDaySignal()!.word.length) return;
 
     // Autoriser uniquement les lettres A-Z
     if (/^[A-Z]$/.test(key)) {
@@ -49,10 +48,10 @@ export class DailyWordComponent {
     if (!this.guess || this.attempts.length >= this.maxGuesses) return;
     const { feedback, correct } = this.ws.checkGuess(
       this.guess,
-      this.wordOfDay.word
+      this.ws.wordOfDaySignal()!.word
     );
     const attempt = {
-      date: this.wordOfDay.date,
+      date: this.ws.wordOfDaySignal()!.date,
       guess: this.guess.toUpperCase(),
       result: correct ? 'correct' : 'incorrect',
       feedback,
@@ -61,11 +60,11 @@ export class DailyWordComponent {
 
     // sauvegarde globale
     const allAttempts = this.storage.loadAttempts();
-    allAttempts[this.wordOfDay.date] = this.attempts;
+    allAttempts[this.ws.wordOfDaySignal()!.date] = this.attempts;
     this.storage.saveAttempts(allAttempts);
 
     if (correct) {
-      this.ss.updateStreak(true, this.wordOfDay.date);
+      this.ss.updateStreak(true, this.ws.wordOfDaySignal()!.date);
     }
     this.guess = '';
   }
