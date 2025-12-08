@@ -3,24 +3,42 @@
   flex-direction: column;
   gap: 5px;
   margin-top: 10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 5px;
 }
 
 .keyboard-row {
   display: flex;
   justify-content: center;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
 .key {
-  min-width: 36px;
+  flex: 1 1 0;
+  min-width: 32px;
+  max-width: 8vw;
   height: 48px;
   border-radius: 4px;
   border: 1px solid #555;
   text-transform: uppercase;
   font-weight: bold;
   cursor: pointer;
+  box-sizing: border-box;
+  white-space: nowrap; /* empêche le texte de passer à la ligne */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Touches spéciales : Enter et Backspace */
+.key.Enter, .key.Backspace {
+  flex: 2 1 0;        /* elles prennent plus de place */
+  min-width: 60px;    /* minimum pour que le texte tienne */
+}
+
+/* Couleurs */
 .key.green { background-color: #30b267; border-color: #30b267; color: white; }
 .key.yellow { background-color: #c8b450; border-color: #c8b450; color: white; }
 .key.gray { background-color: #5a5a5a; border-color: #5a5a5a; color: white; }

@@ -21,7 +21,7 @@ export class ClavierVirtuelComponent {
   rows = [
     ['A','Z','E','R','T','Y','U','I','O','P'],
     ['Q','S','D','F','G','H','J','K','L','M'],
-    ['Backspace','W','X','C','V','B','N','Enter']
+    ['⌫','W','X','C','V','B','N','⏎']
   ];
 
   /** Clique sur une touche */
