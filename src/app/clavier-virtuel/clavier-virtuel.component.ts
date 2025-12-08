@@ -26,6 +26,12 @@ export class ClavierVirtuelComponent {
 
   /** Clique sur une touche */
   onKey(key: string) {
+    if(key === '⌫') {
+      key = 'Backspace'
+    }
+        if(key === '⏎') {
+      key = 'Enter'
+    }
     if (this.disabled()) return;
     this.keyPress.emit(key);
   }
