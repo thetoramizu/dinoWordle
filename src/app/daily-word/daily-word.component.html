@@ -25,7 +25,7 @@
     </span>}
     @else {
     <span class="cell">
-      {{ guess[i] || '' }}
+      {{ typed[i - 1] || '' }}
     </span>
     }
 
@@ -33,7 +33,7 @@
     }
   </div>
 
-  <button (click)="submit()" [disabled]="guess.length !== ws.wordOfDaySignal()!.word.length">
+  <button (click)="submit()" [disabled]="fullGuess.length !== ws.wordOfDaySignal()!.word.length">
     Proposer
   </button>
 
@@ -53,3 +53,11 @@
 
 
 <app-clavier-virtuel [letterStates]="keyboardStates()" (keyPress)="handleVirtualKey($event)"></app-clavier-virtuel>
+
+
+<input
+  #hiddenInput
+  class="hidden-input"
+  type="text"
+  (input)="onHiddenInput($event)"
+/>

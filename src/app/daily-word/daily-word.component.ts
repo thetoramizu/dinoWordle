@@ -7,6 +7,7 @@ import {
   HostListener,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { StorageService } from '../services/storage.service';
 import { StreakService } from '../services/streak.service';
@@ -21,9 +22,14 @@ import { ClavierVirtuelComponent } from '../clavier-virtuel/clavier-virtuel.comp
   templateUrl: './daily-word.component.html',
   styleUrl: './daily-word.component.scss',
 })
-export class DailyWordComponent {
+export class DailyWordComponent implements AfterViewInit {
   guess = '';
   maxGuesses = 5;
+
+  firstLetter = '';
+  typed = '';
+
+  hiddenInput = viewChild<ElementRef<HTMLInputElement>>('hiddenInput');
 
   protected errorMessage = signal<string>('');
 
@@ -38,13 +44,25 @@ export class DailyWordComponent {
     return this.allAttempts()[this.ws.wordOfDaySignal()!.date] || [];
   });
 
+  get fullGuess() {
+    return (this.firstLetter + this.typed).toUpperCase();
+  }
+
   constructor() {
     const first = this.ws.wordOfDaySignal()?.word[0].toUpperCase() || 'S';
-    this.guess = first;
-
+    const w = this.ws.wordOfDaySignal();
+    if (w) {
+      this.firstLetter = w.word[0].toUpperCase();
+    }
     effect(() => {
       this.allAttempts();
       this.updateKeyboardStates();
+    });
+    effect(() => {
+      const w = this.ws.wordOfDaySignal();
+      if (w) {
+        this.firstLetter = w.word[0].toUpperCase();
+      }
     });
   }
 
@@ -52,10 +70,11 @@ export class DailyWordComponent {
   handleKeyboardEvent(event: KeyboardEvent) {
     const key = event.key.toUpperCase();
     const wordLength = this.ws.wordOfDaySignal()?.word.length || 0;
+    const maxTyped = wordLength - 1; // on tape à partir de la 2ᵉ lettre
 
     // Touche Enter → submit si le mot est complet
     if (key === 'ENTER') {
-      if (this.guess.length === wordLength) {
+      if (this.fullGuess.length === wordLength) {
         this.submit();
       }
       event.preventDefault();
@@ -64,8 +83,8 @@ export class DailyWordComponent {
 
     // Suppression
     if (key === 'BACKSPACE') {
-      if (this.guess.length > 1) {
-        this.guess = this.guess.slice(0, -1); // empêche de supprimer la première lettre
+      if (this.typed.length > 1) {
+        this.typed = this.guess.slice(0, -1); // empêche de supprimer la première lettre
       }
       return;
     }
@@ -76,40 +95,63 @@ export class DailyWordComponent {
     // Autoriser uniquement les lettres A-Z
     if (/^[A-Z]$/.test(key)) {
       const maxLength = this.ws.wordOfDaySignal()!.word.length;
-      if (this.guess.length < maxLength) {
+      if (this.typed.length < maxTyped) {
         this.guess += key;
       }
     }
   }
 
+  ngAfterViewInit() {
+    this.focusInput();
+  }
+
+  focusInput() {
+    setTimeout(() => {
+      const nativeElemnt = this.hiddenInput()?.nativeElement;
+      if (nativeElemnt) {
+        nativeElemnt.value = this.firstLetter;
+        nativeElemnt.focus();
+      }
+    });
+  }
+
   submit() {
     const wordSignal = this.ws.wordOfDaySignal();
-    const wordList = this.ws.words(); // liste de mots valides
 
-    if (!this.guess || this.attempts().length >= this.maxGuesses || !wordSignal)
+    if (!wordSignal) return;
+
+    const wordList = this.ws.words(); // liste de mots valides
+    const wordLength = wordSignal.word.length;
+
+    if (this.fullGuess.length !== wordLength) {
+      this.errorMessage.set(`Le mot "${this.fullGuess}" n'existe pas.`);
+      return;
+    }
+
+    if (!this.typed || this.attempts().length >= this.maxGuesses || !wordSignal)
       return;
 
     // Vérifier si le mot est dans la liste
-    if (!wordList.includes(this.guess.toLowerCase())) {
-      this.errorMessage.set(`Le mot "${this.guess}" n'existe pas.`);
+    if (!wordList.includes(this.fullGuess.toLowerCase())) {
+      this.errorMessage.set(`Le mot "${this.fullGuess}" n'existe pas.`);
       return;
     }
 
     const { feedback, correct } = this.ws.checkGuess(
-      this.guess,
+      this.fullGuess,
       wordSignal.word
     );
 
     const attempt: Attempt = {
       date: wordSignal.date,
-      guess: this.guess.toUpperCase(),
+      guess: this.fullGuess.toUpperCase(),
       result: correct ? 'correct' : 'incorrect',
       feedback,
     };
 
     const date = wordSignal.date;
 
-    // 1️⃣ Mettre à jour le signal allAttempts
+    //  Mettre à jour le signal allAttempts
     this.allAttempts.update((current) => {
       const clone = { ...current }; // clone de l'objet existant
       if (!clone[date]) clone[date] = []; // initialise le tableau si nécessaire
@@ -117,16 +159,18 @@ export class DailyWordComponent {
       return clone;
     });
 
-    // 2️⃣ Sauvegarde dans le localStorage
+    //  Sauvegarde dans le localStorage
     this.storage.saveAttempts(this.allAttempts());
 
-    // 3️⃣ Mise à jour du streak si correct
+    //  Mise à jour du streak si correct
     if (correct) {
       this.ss.updateStreak(true, date);
     }
 
-    // 4️⃣ Réinitialiser la saisie
-    this.guess = '';
+    // Réinitialiser la saisie
+    this.typed = '';
+    this.errorMessage.set('');
+    this.focusInput();
   }
 
   getLetters(attempt: any): string[] {
@@ -164,14 +208,36 @@ export class DailyWordComponent {
   handleVirtualKey(key: string) {
     const wordSignal = this.ws.wordOfDaySignal();
     if (!wordSignal) return;
-    const wordLength = wordSignal.word.length;
+    const maxTyped = wordSignal.word.length - 1;
 
-    if (key === 'Enter' && this.guess.length === wordLength) this.submit();
-    else if (key === 'Backspace' && this.guess.length > 1)
-      this.guess = this.guess.slice(0, -1);
-    else if (/^[A-Z]$/.test(key)) {
-      const maxLength = this.ws.wordOfDaySignal()!.word.length;
-      if (this.guess.length < maxLength) this.guess += key;
+    if (key === 'Enter') {
+      if (this.fullGuess.length === wordSignal.word.length) this.submit();
+    } else if (key === 'Backspace') {
+      if (this.typed.length > 0) this.typed = this.typed.slice(0, -1);
+    } else if (/^[A-Z]$/.test(key)) {
+      if (this.typed.length < maxTyped) {
+        this.typed += key;
+        this.focusInput();
+      }
     }
+  }
+
+  onHiddenInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    let value = input.value.toUpperCase();
+
+    // La première lettre est toujours fixed
+    if (!value.startsWith(this.firstLetter)) {
+      value = this.firstLetter + value.replace(/[^A-Z]/g, '').slice(0);
+    }
+
+    const max = this.ws.wordOfDaySignal()!.word.length - 1;
+
+    // typed = tout sauf la première lettre
+    this.typed = value.slice(1).slice(0, max);
+
+    // Mise à jour de la valeur de l’input pour rester cohérent
+    input.value = this.firstLetter + this.typed;
   }
 }
