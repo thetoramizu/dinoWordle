@@ -39,6 +39,9 @@ export class DailyWordComponent implements AfterViewInit {
 
   keyboardStates = signal<Record<string, 'green' | 'yellow' | 'gray'>>({});
 
+  private updatingInput = false;
+
+
   allAttempts = signal<any>(this.storage.loadAttempts());
   attempts = computed(() => {
     return this.allAttempts()[this.ws.wordOfDaySignal()!.date] || [];
@@ -66,6 +69,7 @@ export class DailyWordComponent implements AfterViewInit {
     });
   }
 
+// Gestion clavier physique
 @HostListener('window:keydown', ['$event'])
 handleKeyboardEvent(event: KeyboardEvent) {
   const key = event.key.toUpperCase();
@@ -79,7 +83,10 @@ handleKeyboardEvent(event: KeyboardEvent) {
   }
 
   if (key === 'BACKSPACE') {
-    if (this.typed.length > 0) this.typed = this.typed.slice(0, -1);
+    if (this.typed.length > 0) {
+      this.typed = this.typed.slice(0, -1);
+      this.syncHiddenInput();
+    }
     event.preventDefault();
     return;
   }
@@ -87,17 +94,18 @@ handleKeyboardEvent(event: KeyboardEvent) {
   if (/^[A-Z]$/.test(key)) {
     if (this.typed.length < maxTyped) {
       this.typed += key;
+      this.syncHiddenInput();
     }
   }
 }
 
-  private syncHiddenInput() {
-    const el = this.hiddenInput()?.nativeElement;
-    if (!el) return;
-
-    el.value = this.firstLetter + this.typed;
-    el.focus();
-  }
+private syncHiddenInput() {
+  const el = this.hiddenInput()?.nativeElement;
+  if (!el) return;
+  this.updatingInput = true;       // ⚡ on marque que c’est un update programmatique
+  el.value = this.firstLetter + this.typed;
+  this.updatingInput = false;      // ⚡ fin de l’update
+}
 
   ngAfterViewInit() {
     this.focusInput();
@@ -202,43 +210,35 @@ handleKeyboardEvent(event: KeyboardEvent) {
     this.keyboardStates.set(states);
   }
 
-  handleVirtualKey(key: string) {
-    const wordSignal = this.ws.wordOfDaySignal();
-    if (!wordSignal) return;
+handleVirtualKey(key: string) {
+  const wordSignal = this.ws.wordOfDaySignal();
+  if (!wordSignal) return;
+  const maxTyped = wordSignal.word.length - 1;
 
-    const maxTyped = wordSignal.word.length - 1;
-
-    if (key === 'Enter') {
-      if (this.fullGuess.length === wordSignal.word.length) this.submit();
-    } else if (key === 'Backspace') {
-      if (this.typed.length > 0) {
-        this.typed = this.typed.slice(0, -1);
-      }
-    } else if (/^[A-Z]$/.test(key)) {
-      if (this.typed.length < maxTyped) {
-        this.typed += key;
-      }
+  if (key === 'Enter') {
+    if (this.fullGuess.length === wordSignal.word.length) this.submit();
+  } else if (key === 'Backspace') {
+    if (this.typed.length > 0) this.typed = this.typed.slice(0, -1);
+  } else if (/^[A-Z]$/.test(key)) {
+    if (this.typed.length < maxTyped) {
+      this.typed += key;
     }
-
-    this.syncHiddenInput();
   }
 
+  // Mise à jour du hiddenInput pour rester cohérent
+  this.syncHiddenInput();
+}
+
 onHiddenInput(event: Event) {
-  const input = event.target as HTMLInputElement;
+  if (this.updatingInput) return; // ⚡ ignore les changements programmatiques
 
-  const raw = input.value.replace(/[^A-Za-z]/g, '').toUpperCase();
-
-  // Détermine la partie tapée
-  const withoutFirst = raw.startsWith(this.firstLetter)
-      ? raw.slice(1)
-      : raw;
-
+  const el = event.target as HTMLInputElement;
+  const raw = el.value.toUpperCase().replace(/[^A-Z]/g, '');
+  const withoutFirst = raw.startsWith(this.firstLetter) ? raw.slice(1) : raw;
   const max = this.ws.wordOfDaySignal()!.word.length - 1;
-
   this.typed = withoutFirst.slice(0, max);
 
-  // met à jour l'input sans créer de boucle
-  input.value = this.firstLetter + this.typed;
+  this.syncHiddenInput();
 }
 
   onBlurHiddenInput() {

@@ -44,7 +44,6 @@ export class WordService {
     return firstValueFrom(
       this.http.get<string[]>('assets/dictionnaire.json')
     ).then((data) => {
-      console.log(data);
       this.words.set(data);
     });
   }
@@ -56,7 +55,6 @@ export class WordService {
 
   getWordOfDay(date = new Date()) {
     const idx = this.getIndexFromDate(date, this.words().length);
-    console.log(idx, this.words());
 
     return { date: this.yyyyMmDd(date), word: this.words()[idx].toUpperCase() };
   }
