@@ -1,0 +1,26 @@
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.key {
+  min-width: 36px;
+  height: 48px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.key.green { background-color: #30b267; border-color: #30b267; color: white; }
+.key.yellow { background-color: #c8b450; border-color: #c8b450; color: white; }
+.key.gray { background-color: #5a5a5a; border-color: #5a5a5a; color: white; }

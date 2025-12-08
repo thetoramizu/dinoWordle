@@ -4,7 +4,7 @@
   <div style="height:12px"></div>
 
   <!-- Tentatives précédentes -->
-  @for (a of attempts; track $index) {
+  @for (a of attempts(); track $index) {
   <div class="row">
     @for (c of getLetters(a); let i = $index; track i) {
     <span class="cell" [class]="getColor(a, i)">
@@ -29,9 +29,25 @@
     Proposer
   </button>
 
-  @if (attempts.length >= maxGuesses && !isLastCorrect()) {
+  @if (attempts().length >= maxGuesses && !isLastCorrect()) {
   <div class="small answer">
     Plus de tentatives disponibles. Le mot était: {{ ws.wordOfDaySignal()!.word }}
   </div>
   }
+
+    @if (errorMessage()) {
+
+  <div class="small answer">
+  {{ errorMessage() }}
 </div>
+    }
+</div>
+
+
+<app-clavier-virtuel  [letterStates]="keyboardStates()"
+  (keyPress)="handleVirtualKey($event)"></app-clavier-virtuel>
+
+
+<!-- Zone d'input cachée pour mobile/desktop -->
+<input type="text" inputmode="text" pattern="[A-Za-z]*" #guessInput type="text" [(ngModel)]="guess"
+  maxlength="{{ ws.wordOfDaySignal()!.word.length }}" (input)="onInputChange($event)" class="hidden-input" />

@@ -5,7 +5,7 @@ import { firstValueFrom } from 'rxjs';
 @Injectable()
 export class WordService {
   private epoch = new Date('2024-01-01T00:00:00Z');
-  private words = signal<string[]>([]);
+  words = signal<string[]>([]);
 
   public wordOfDaySignal = computed(() => {
     if (this.words().length === 0) return null;

@@ -1,0 +1,15 @@
+<div class="keyboard">
+  @for (row of rows; track $index) {
+    <div class="keyboard-row">
+      @for (key of row; track $index) {
+        <button class="key"
+                [class.green]="getKeyColor(key) === 'green'"
+                [class.yellow]="getKeyColor(key) === 'yellow'"
+                [class.gray]="getKeyColor(key) === 'gray'"
+                (click)="onKey(key)">
+          {{ key }}
+        </button>
+      }
+    </div>
+  }
+</div>
