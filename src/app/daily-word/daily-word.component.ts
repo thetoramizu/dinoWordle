@@ -7,14 +7,13 @@ import {
   HostListener,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { StorageService } from '../services/storage.service';
 import { StreakService } from '../services/streak.service';
 import { WordService } from '../services/word.service';
 import { FormsModule } from '@angular/forms';
 import { Attempt } from '../models/attempt';
-import { ClavierVirtuelComponent } from "../clavier-virtuel/clavier-virtuel.component";
+import { ClavierVirtuelComponent } from '../clavier-virtuel/clavier-virtuel.component';
 
 @Component({
   selector: 'app-daily-word',
@@ -22,48 +21,31 @@ import { ClavierVirtuelComponent } from "../clavier-virtuel/clavier-virtuel.comp
   templateUrl: './daily-word.component.html',
   styleUrl: './daily-word.component.scss',
 })
-export class DailyWordComponent implements AfterViewInit {
-  guessInput = viewChild<ElementRef>('guessInput');
+export class DailyWordComponent {
   guess = '';
-  maxGuesses = 6;
+  maxGuesses = 5;
 
- protected errorMessage = signal<string>('');
-
+  protected errorMessage = signal<string>('');
 
   protected readonly ws = inject(WordService);
   private readonly storage = inject(StorageService);
   private readonly ss = inject(StreakService);
 
-  keyboardStates = signal<Record<string,'green'|'yellow'|'gray'>>({});
-
+  keyboardStates = signal<Record<string, 'green' | 'yellow' | 'gray'>>({});
 
   allAttempts = signal<any>(this.storage.loadAttempts());
   attempts = computed(() => {
-    console.log('computed', this.allAttempts());
     return this.allAttempts()[this.ws.wordOfDaySignal()!.date] || [];
   });
 
   constructor() {
+    const first = this.ws.wordOfDaySignal()?.word[0].toUpperCase() || 'S';
+    this.guess = first;
+
     effect(() => {
       this.allAttempts();
-      this.updateKeyboardStates()
+      this.updateKeyboardStates();
     });
-  }
-
-  ngOnInit() {
-    this.ws.wordOfDaySignal();
-    // const allAttempts = signal<any>(  this.storage.loadAttempts());
-    // console.log(allAttempts);
-
-    // this.attempts = allAttempts()[this.ws.wordOfDaySignal()!.date] || [];
-  }
-
-  ngAfterViewInit() {
-    this.guessInput()!.nativeElement.focus();
-  }
-
-  focusInput() {
-    this.guessInput()!.nativeElement.focus();
   }
 
   @HostListener('window:keydown', ['$event'])
@@ -82,7 +64,9 @@ export class DailyWordComponent implements AfterViewInit {
 
     // Suppression
     if (key === 'BACKSPACE') {
-      this.guess = this.guess.slice(0, -1);
+      if (this.guess.length > 1) {
+        this.guess = this.guess.slice(0, -1); // empêche de supprimer la première lettre
+      }
       return;
     }
 
@@ -91,31 +75,25 @@ export class DailyWordComponent implements AfterViewInit {
 
     // Autoriser uniquement les lettres A-Z
     if (/^[A-Z]$/.test(key)) {
-      this.guess += key;
+      const maxLength = this.ws.wordOfDaySignal()!.word.length;
+      if (this.guess.length < maxLength) {
+        this.guess += key;
+      }
     }
-  }
-
-  onInputChange(event: any) {
-    const val = event.target.value.toUpperCase();
-    const maxLength = this.ws.wordOfDaySignal()!.word.length;
-    this.guess = val.slice(0, maxLength); // limite à la longueur du mot
   }
 
   submit() {
     const wordSignal = this.ws.wordOfDaySignal();
-      const wordList = this.ws.words(); // liste de mots valides
+    const wordList = this.ws.words(); // liste de mots valides
 
     if (!this.guess || this.attempts().length >= this.maxGuesses || !wordSignal)
       return;
 
-      // Vérifier si le mot est dans la liste
-  if (!wordList.includes(this.guess.toLowerCase())) {
-    this.errorMessage.set(`Le mot "${this.guess}" n'existe pas.`);
-    return;
-  }
-
-
-
+    // Vérifier si le mot est dans la liste
+    if (!wordList.includes(this.guess.toLowerCase())) {
+      this.errorMessage.set(`Le mot "${this.guess}" n'existe pas.`);
+      return;
+    }
 
     const { feedback, correct } = this.ws.checkGuess(
       this.guess,
@@ -167,31 +145,33 @@ export class DailyWordComponent implements AfterViewInit {
     return this.attempts()[this.attempts.length - 1].result === 'correct';
   }
 
-
-
-
   // Calcul automatique des états des lettres à partir des essais
-updateKeyboardStates() {
-  const states: Record<string,'green'|'yellow'|'gray'> = {};
-  for (const attempt of this.attempts()) {
-    attempt.feedback.forEach((f: any,i: any) => {
-      const letter = attempt.guess[i];
-      if (f === 'green') states[letter] = 'green';
-      else if (f === 'yellow' && states[letter] !== 'green') states[letter] = 'yellow';
-      else if (!states[letter]) states[letter] = 'gray';
-    });
+  updateKeyboardStates() {
+    const states: Record<string, 'green' | 'yellow' | 'gray'> = {};
+    for (const attempt of this.attempts()) {
+      attempt.feedback.forEach((f: any, i: any) => {
+        const letter = attempt.guess[i];
+        if (f === 'green') states[letter] = 'green';
+        else if (f === 'yellow' && states[letter] !== 'green')
+          states[letter] = 'yellow';
+        else if (!states[letter]) states[letter] = 'gray';
+      });
+    }
+    this.keyboardStates.set(states);
   }
-  this.keyboardStates.set(states);
-}
 
-// Gestion des touches du clavier virtuel
-handleVirtualKey(key: string) {
-  const wordSignal = this.ws.wordOfDaySignal();
-  if (!wordSignal) return;
-  const wordLength = wordSignal.word.length;
+  // Gestion des touches du clavier virtuel
+  handleVirtualKey(key: string) {
+    const wordSignal = this.ws.wordOfDaySignal();
+    if (!wordSignal) return;
+    const wordLength = wordSignal.word.length;
 
-  if (key === 'Enter' && this.guess.length === wordLength) this.submit();
-  else if (key === 'Backspace') this.guess = this.guess.slice(0,-1);
-  else if (/^[A-Z]$/.test(key) && this.guess.length < wordLength) this.guess += key;
-}
+    if (key === 'Enter' && this.guess.length === wordLength) this.submit();
+    else if (key === 'Backspace' && this.guess.length > 1)
+      this.guess = this.guess.slice(0, -1);
+    else if (/^[A-Z]$/.test(key)) {
+      const maxLength = this.ws.wordOfDaySignal()!.word.length;
+      if (this.guess.length < maxLength) this.guess += key;
+    }
+  }
 }

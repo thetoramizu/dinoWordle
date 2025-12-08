@@ -16,7 +16,7 @@ export class SequenceComponent implements OnInit {
   private readonly storage = inject(StorageService);
 
   ngOnInit() {
-    this.seq = this.ws.getSequence(14);
+    // this.seq = this.ws.getSequence(14);
     this.attempts = this.storage.loadAttempts();
   }
 
