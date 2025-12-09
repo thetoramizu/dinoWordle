@@ -24,7 +24,7 @@ import { ClavierVirtuelComponent } from '../clavier-virtuel/clavier-virtuel.comp
 })
 export class DailyWordComponent implements AfterViewInit {
   // guess = '';
-  maxGuesses = 5;
+  maxGuesses = 6;
 
   firstLetter = '';
   typed = '';
