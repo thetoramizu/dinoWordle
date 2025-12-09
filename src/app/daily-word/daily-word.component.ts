@@ -15,15 +15,15 @@ import { WordService } from '../services/word.service';
 import { FormsModule } from '@angular/forms';
 import { Attempt } from '../models/attempt';
 import { ClavierVirtuelComponent } from '../clavier-virtuel/clavier-virtuel.component';
+import { DailySequenceComponent } from "../daily-sequence/daily-sequence.component";
 
 @Component({
   selector: 'app-daily-word',
-  imports: [FormsModule, ClavierVirtuelComponent],
+  imports: [FormsModule, ClavierVirtuelComponent, DailySequenceComponent],
   templateUrl: './daily-word.component.html',
   styleUrl: './daily-word.component.scss',
 })
 export class DailyWordComponent implements AfterViewInit {
-  // guess = '';
   maxGuesses = 5;
 
   firstLetter = '';

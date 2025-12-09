@@ -1,16 +1,38 @@
 import { Injectable } from '@angular/core';
-
+import { Attempt } from '../models/attempt';
 
 @Injectable()
 export class StorageService {
-private ATTEMPTS = 'tusmo_attempts_v1';
-private STREAK = 'tusmo_streak_v1';
+  private readonly DAILY = 'daily_attempts';
+  private readonly STREAK = 'tusmo_streak';
+  private readonly SEQUENCE = 'daily_sequence';
 
+  saveAttempts(data: Attempt) {
+    localStorage.setItem(this.DAILY, JSON.stringify(data));
+  }
+  loadAttempts() {
+    const raw = localStorage.getItem(this.DAILY);
+    return raw ? JSON.parse(raw) : {};
+  }
 
-saveAttempts(data: any) { localStorage.setItem(this.ATTEMPTS, JSON.stringify(data)); }
-loadAttempts() { const raw = localStorage.getItem(this.ATTEMPTS); return raw ? JSON.parse(raw) : {}; }
+  saveStreak(data: any) {
+    localStorage.setItem(this.STREAK, JSON.stringify(data));
+  }
+  loadStreak() {
+    const raw = localStorage.getItem(this.STREAK);
+    return raw ? JSON.parse(raw) : null;
+  }
 
-
-saveStreak(data: any) { localStorage.setItem(this.STREAK, JSON.stringify(data)); }
-loadStreak() { const raw = localStorage.getItem(this.STREAK); return raw ? JSON.parse(raw) : null; }
+  saveDailySequence(data: {
+    [date: string]: {
+      solvedCount: number;
+      attempts: Record<number, Attempt[]>;
+    };
+  }) {
+    localStorage.setItem(this.SEQUENCE, JSON.stringify(data));
+  }
+  loadDailySequence() {
+    const raw = localStorage.getItem(this.SEQUENCE);
+    return raw ? JSON.parse(raw) : {};
+  }
 }

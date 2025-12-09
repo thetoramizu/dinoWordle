@@ -1,7 +1,53 @@
 <div class="app">
   <h1>Sumot Dino !</h1>
+
+
+  <div class="tabs-container">
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'daily'" (click)="activeTab = 'daily'">
+        Daily
+      </button>
+
+      <button class="tab-btn" [class.active]="activeTab === 'sequence'" (click)="activeTab = 'sequence'">
+        Suite
+      </button>
+    </div>
+
+    <div class="tab-underline" [style.left]="activeTab === 'daily' ? '0%' : '50%'"></div>
+  </div>
+
+  @switch (activeTab) {
+
+  @case ('daily') {
+  @if (ws.wordOfDaySignal(); as dailyWord) {
+  <app-word-game type="daily" [wordToFind]="dailyWord">
+  </app-word-game>
+  }
+  }
+
+  @case ('sequence') {
+  @if (ws.dailySequence(); as dailySequence) {
+  <app-daily-sequence [listDailySequence]="dailySequence">
+  </app-daily-sequence>
+  }
+  }
+  }
+
+
+  <!-- @if(ws.wordOfDaySignal(); as dailyWord) {
+ <app-word-game [type]="'daily'" [wordToFind]="dailyWord"></app-word-game>
+}
+
+
+
+  @if(ws.dailySequence(); as dailySequence) {
+  <app-daily-sequence [listDailySequence]="dailySequence"></app-daily-sequence>
+  } -->
+
+
+
   <div class="daily">
-    <app-daily-word></app-daily-word>
+    <!-- <app-daily-word></app-daily-word> -->
   </div>
 
 

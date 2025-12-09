@@ -1,0 +1,16 @@
+
+<app-word-game [type]="'sequence'" [wordToFind]="currentWord()"></app-word-game>
+
+  @if (ws.countSequenceSolvedToday() > 0) {
+    <div class="sequence-progress">
+      <div class="sequence-title">Mots trouvés</div>
+
+      <div class="sequence-list">
+        @for (word of listDailySequence().slice(0, ws.countSequenceSolvedToday()); track $index) {
+          <div class="sequence-item solved">
+            {{ word.word.toUpperCase() }}
+          </div>
+        }
+      </div>
+    </div>
+  }

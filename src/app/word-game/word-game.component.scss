@@ -1,0 +1,174 @@
+.board {
+  max-width: 360px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  justify-content: center;
+  // display: grid;
+}
+
+.header-wordle {
+  text-align: center;
+  padding: 12px 0 14px 0;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #d3d6da;
+}
+
+.header-wordle .title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.header-wordle .date {
+  font-size: 13px;
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+  color: #565758;
+}
+
+.row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  animation: pop 0.15s ease-out;
+  box-sizing: border-box; /* important pour inclure les bordures */
+  border: 2px solid transparent; /* uniforme pour toutes les cellules */
+}
+
+/* Résultat à droite */
+.result {
+  margin-left: 10px;
+  color: #ccc;
+}
+
+/* Animation pop */
+@keyframes pop {
+  0% {
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.input-row input {
+  flex: 1;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.answer {
+  margin-top: 12px;
+  color: #e44;
+}
+
+.green {
+  background-color: #30b267;
+  border-color: #30b267;
+}
+.yellow {
+  background-color: #c8b450;
+  border-color: #c8b450;
+}
+.gray {
+  background-color: #5a5a5a;
+  border-color: #5a5a5a;
+}
+
+/* Ligne de saisie */
+.current .cell {
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 2px solid #555;
+  /* même largeur/hauteur et box-sizing déjà définis dans .cell */
+}
+
+.hidden-input {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  border: none;
+}
+
+.cell.fixed {
+  background: #ddd;
+  font-weight: bold;
+  border: 2px solid #333;
+}
+
+.victory-message {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 10px 16px;
+  background-color: #ffffff; /* fond blanc */
+  color: #388e3c; /* vert doux pour victoire */
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid #c0c0c0; /* bordure discrète */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* léger relief */
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+.current .cell {
+  position: relative;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 2px solid #555;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.current .cell .mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.3); /* vert Wordle translucide */
+  font-weight: bold;
+  text-transform: uppercase;
+  pointer-events: none; /* permet de taper par-dessus */
+}

@@ -1,10 +1,16 @@
 <div class="board">
 
-  <div class="small">Mot du jour • {{ ws.wordOfDaySignal()!.date }}</div>
-  <div style="height:12px"></div>
+  <div class="header-wordle">
+    <div class="title">
+      {{ type() === 'sequence' ? 'Séquence du jour' : 'Mot du jour' }}
+    </div>
+    <div class="date">
+      {{ wordToFind()!.date }}
+    </div>
+  </div>
 
   <!-- Tentatives précédentes -->
-  @for (a of attempts(); track $index) {
+  @for (a of dailyAttempts(); track $index) {
   <div class="row">
     @for (c of getLetters(a); let i = $index; track i) {
     <span class="cell" [class]="getColor(a, i)">
@@ -19,27 +25,31 @@
   @if(canAttempt()) {
   <!-- Tentative en cours -->
   <div class="row current">
-    @for (letter of ws.wordOfDaySignal()!.word.split(''); let i = $index; track i) {
-    @if(i === 0){
-    <span class="cell fixed">
+    @for (letter of wordToFind()!.word.split(''); let i = $index; track i) {
+
+    @if(i === 0)
+    {<span class="cell fixed">
       {{ letter.toUpperCase() }}
     </span>}
-    @else {
+    @else{
     <span class="cell">
+      <!-- Masque vert semi-transparent -->
+      @if(!typed[i - 1] && getMaskLetters()[i]){
+      <span class="mask">{{ getMaskLetters()[i] }}</span>}
+      <!-- Lettre tapée -->
       {{ typed[i - 1] || '' }}
-    </span>
-    }
+    </span>}
     }
   </div>
 
-  <button (click)="submit()" [disabled]="fullGuess.length !== ws.wordOfDaySignal()!.word.length">
+  <button (click)="submit()" [disabled]="fullGuess.length !== wordToFind()!.word.length">
     Proposer
   </button>
   }
 
-  @if (attempts().length >= maxGuesses && !isLastCorrect()) {
+  @if (dailyAttempts().length >= maxGuesses && !isLastCorrect()) {
   <div class="small answer">
-    Plus de tentatives disponibles. Le mot était: {{ ws.wordOfDaySignal()!.word }}
+    Plus de tentatives disponibles. Le mot était: {{ wordToFind()!.word }}
   </div>
   }
 
@@ -54,9 +64,9 @@
 
 @if (isLastCorrect() ) {
 
-  <div class="victory-message">
-    🎉 BRAVO ! Tu as trouvé le mot du jour !
-  </div>
+<div class="victory-message">
+  🎉 BRAVO ! Tu as trouvé le mot du jour !
+</div>
 
 }
 
@@ -65,5 +75,3 @@
 
 
 <input #hiddenInput type="text" autocomplete="off" autocorrect="off" spellcheck="false" class="hidden-input" readonly />
-
-

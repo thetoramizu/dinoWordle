@@ -1,15 +1,26 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { WordOfDay } from '../models/word';
+import { StorageService } from './storage.service';
 
 @Injectable()
 export class WordService {
+  private readonly storageService = inject(StorageService)
   private epoch = new Date('2024-01-01T00:00:00Z');
   words = signal<string[]>([]);
+  countSequenceSolvedToday = signal(0)
+
+  dailySequence = computed<WordOfDay[]>(() => {
+    const words = this.words(); // ✅ lecture du signal
+    if (words.length === 0) return [];
+    return this.words() ? this.getDailyWordSequence() : [];
+  });
 
   public wordOfDaySignal = computed(() => {
     if (this.words().length === 0) return null;
     const idx = this.getIndexFromDate(new Date(), this.words().length);
+
     return {
       date: this.yyyyMmDd(new Date()),
       word: this.words()[idx].toUpperCase(),
@@ -17,6 +28,7 @@ export class WordService {
   });
 
   constructor(private http: HttpClient) {
+    this.loadDailySequenceProgression()
     // this.loadDictionary();
   }
 
@@ -109,5 +121,47 @@ export class WordService {
       out.push(this.getWordOfDay(d));
     }
     return out;
+  }
+
+  wordsOfLength(length: number): string[] {
+    return this.words()
+      .filter((word) => word.length === length)
+      .map((w) => w.toUpperCase());
+  }
+
+  private getIndexForLength(date: Date, length: number, max: number) {
+    const days = this.daysSinceEpoch(date);
+    // Mélange léger en fonction du nombre de jours ET de la longueur du mot
+    const seed = (days * (9300 + length) + 49297) % 233280;
+    return seed % max;
+  }
+
+  /**
+   * Récupère les 4 mots de la série du jour.
+   * @param date
+   * @returns
+   */
+  getDailyWordSequence(date = new Date()) {
+    const lengths = [5, 6, 7, 8]; // les longueurs souhaitées
+    const sequence: WordOfDay[] = [];
+
+    for (const len of lengths) {
+      const list = this.wordsOfLength(len);
+      if (list.length === 0) continue;
+
+      const idx = this.getIndexForLength(date, len, list.length);
+      sequence.push({ date: this.yyyyMmDd(date), word: list[idx] });
+    }
+
+    return sequence;
+  }
+
+  loadDailySequenceProgression() {
+    const date = new Date()
+    const currentState = this.storageService.loadDailySequence()
+    console.log( currentState[ this.yyyyMmDd(date)]);
+    const number = currentState[ this.yyyyMmDd(date)] ? currentState[ this.yyyyMmDd(date)].solvedCount : 0
+    console.log(number);
+    this.countSequenceSolvedToday.set(number)
   }
 }
