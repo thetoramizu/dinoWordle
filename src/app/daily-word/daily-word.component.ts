@@ -19,12 +19,12 @@ import { DailySequenceComponent } from "../daily-sequence/daily-sequence.compone
 
 @Component({
   selector: 'app-daily-word',
-  imports: [FormsModule, ClavierVirtuelComponent, DailySequenceComponent],
+  imports: [FormsModule, ClavierVirtuelComponent],
   templateUrl: './daily-word.component.html',
   styleUrl: './daily-word.component.scss',
 })
 export class DailyWordComponent implements AfterViewInit {
-  maxGuesses = 5;
+  maxGuesses = 6;
 
   firstLetter = '';
   typed = '';
