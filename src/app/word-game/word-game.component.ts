@@ -27,7 +27,7 @@ import { WordOfDay } from '../models/word';
 export class WordGameComponent implements AfterViewInit {
   wordToFind = input.required<WordOfDay>();
   type = input.required<string>();
-  maxGuesses = 22;
+  maxGuesses = 6;
 
   firstLetter = '';
   typed = '';
