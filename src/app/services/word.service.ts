@@ -63,7 +63,7 @@ export class WordService {
   loadDictionary(): Promise<void> {
     // firstValueFrom remplace toPromise()
     return firstValueFrom(
-      this.http.get<string[]>('assets/dictionnaire-facile.json')
+      this.http.get<string[]>('assets/dictionnaire.json')
     ).then((data) => {
       this.words.set(data);
     });
