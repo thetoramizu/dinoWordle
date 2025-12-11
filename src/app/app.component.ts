@@ -19,7 +19,7 @@ import { DailySequenceComponent } from './daily-sequence/daily-sequence.componen
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'DinoWordle';
+  title = 'Sumot';
   activeTab: 'daily' | 'sequence' = 'daily';
 
   protected readonly ws = inject(WordService);
