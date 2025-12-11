@@ -18,5 +18,6 @@ export class InfiniteModeComponent {
 
   refresh() {
     this.wordService.getRandomWord();
+    this.wordService.allAttemptsInfinite.set([])
   }
 }

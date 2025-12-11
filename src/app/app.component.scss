@@ -92,13 +92,7 @@ h1 {
 .card:last-child {
   margin-bottom: 0;
 }
-/* Animation hover (désactivée sur mobile pour éviter le flash) */
-@media (hover: hover) {
-  .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 22px rgba(0,0,0,0.12);
-  }
-}
+
 
 /* Espacement entre les sections */
 .card + .card {

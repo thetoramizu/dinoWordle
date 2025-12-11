@@ -22,7 +22,7 @@ export class WordService {
   });
 
   dailySequence = computed<WordOfDay[]>(() => {
-    const words = this.words(); // ✅ lecture du signal
+    const words = this.words(); //  lecture du signal
     if (words.length === 0) return [];
     return this.words() ? this.getDailyWordSequence() : [];
   });

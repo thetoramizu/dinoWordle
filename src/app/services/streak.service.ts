@@ -56,15 +56,10 @@ export class StreakService {
       this.sequenceStreak.bestStreak = this.sequenceStreak.currentStreak;
     this.sequenceStreak.lastSuccessDate = dateStr;
 
-    console.log(this.sequenceStreak);
-    console.log(this.dailyStreak);
-
     const newStreak: StreakInfo = {
       daily: this.dailyStreak,
       sequence: this.sequenceStreak
     }
-
-    console.log('nex', newStreak);
 
     this.storage.saveStreak(newStreak);
   }
