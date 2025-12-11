@@ -21,7 +21,9 @@ export class DailySequenceComponent  {
 listDailySequence = input.required<WordOfDay[]>();
 
 currentWord = computed<WordOfDay>(()=>{
-  return this.listDailySequence()[this.ws.countSequenceSolvedToday()];
+  let count = this.ws.countSequenceSolvedToday();
+  if(count >=4) { count = 3}
+  return this.listDailySequence()[count];
 })
 
 }

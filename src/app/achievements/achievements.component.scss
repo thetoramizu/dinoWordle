@@ -1,1 +1,49 @@
-h3 { margin-top: 0; }
+.achievements-container {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 10px;
+  font-family: system-ui, sans-serif;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.card {
+  background: #f8f8f8; /* gris très clair */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1px solid #e5e5e5;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-top: 18px;
+  margin-bottom: 10px;
+  color: #444;
+  border-left: 4px solid #4e9cff;
+  padding-left: 8px;
+}
+
+.section-title:first-of-type {
+  margin-top: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 1rem;
+  color: #555;
+  border-bottom: 1px solid #e3e3e3;
+}
+
+.row:last-of-type {
+  border-bottom: none;
+}

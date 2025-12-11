@@ -10,6 +10,9 @@ export class WordService {
   private epoch = new Date('2024-01-01T00:00:00Z');
   words = signal<string[]>([]);
   countSequenceSolvedToday = signal(0)
+    countSequenceSolvedTodayComputed = computed(() => {
+      return this.countSequenceSolvedToday() >=4 ? 3 : this.countSequenceSolvedToday()
+    })
 
   dailySequence = computed<WordOfDay[]>(() => {
     const words = this.words(); // ✅ lecture du signal

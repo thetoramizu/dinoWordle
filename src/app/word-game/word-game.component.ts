@@ -17,10 +17,11 @@ import { FormsModule } from '@angular/forms';
 import { Attempt } from '../models/attempt';
 import { ClavierVirtuelComponent } from '../clavier-virtuel/clavier-virtuel.component';
 import { WordOfDay } from '../models/word';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-word-game',
-  imports: [FormsModule, ClavierVirtuelComponent],
+  imports: [FormsModule, ClavierVirtuelComponent, DatePipe],
   templateUrl: './word-game.component.html',
   styleUrl: './word-game.component.scss',
 })
@@ -52,29 +53,13 @@ export class WordGameComponent implements AfterViewInit {
     if (this.type() === 'sequence') {
       return (
         this.allAttemptsSequence()[this.wordToFind()!.date]?.attempts[
-          this.ws.countSequenceSolvedToday()
+          this.ws.countSequenceSolvedTodayComputed()
         ] || []
       );
     } else {
       return this.allAttempts()[this.wordToFind()!.date] || [];
     }
   });
-
-  /**
-   * Récupère les tentatives du jour.
-   */
-  // attempts = computed(() => {
-  //   if (this.type() === 'sequence') {
-  //     console.log(this.allAttemptsSequence());
-  //     console.log(this.allAttemptsSequence()[this.wordToFind()!.date]?.attempts[this.ws.countSequenceSolvedToday()]);
-  //     const allattempstforcurrentindex = this.allAttemptsSequence()[this.wordToFind()!.date]?.attempts[this.ws.countSequenceSolvedToday()]
-
-  //     return allattempstforcurrentindex || [];
-  //   } else {
-  //     return this.allAttempts()[this.wordToFind()!.date] || [];
-  //   }
-  // });
-
   canAttempt = computed(
     () => this.dailyAttempts().length < this.maxGuesses && !this.isLastCorrect()
   );
@@ -94,13 +79,11 @@ export class WordGameComponent implements AfterViewInit {
     effect(() => {
       this.allAttempts();
       this.allAttemptsSequence();
-      console.log('all attempts : ', this.allAttempts());
 
       this.updateKeyboardStates();
     });
     effect(() => {
       const w = this.wordToFind();
-      console.log('k:jsdghkduhsf', this.wordToFind());
 
       if (w) {
         this.firstLetter = w.word[0].toUpperCase();
@@ -162,7 +145,7 @@ export class WordGameComponent implements AfterViewInit {
 
   submit() {
     const wordSignal = this.wordToFind();
-    const date = wordSignal.date
+    const date = wordSignal.date;
 
     if (!wordSignal) return;
 
@@ -198,11 +181,6 @@ export class WordGameComponent implements AfterViewInit {
       this.saveDaily();
     }
 
-    //  Mise à jour du streak si correct
-    if (correct) {
-      this.ss.updateStreak(true, date);
-    }
-
     // Réinitialiser la saisie
     this.typed = '';
     this.errorMessage.set('');
@@ -215,6 +193,19 @@ export class WordGameComponent implements AfterViewInit {
         return;
       }
       this.ws.countSequenceSolvedToday.set(count + 1);
+    }
+
+    //  Mise à jour du streak si correct
+    if (correct) {
+      if (
+        this.type() === 'sequence' &&
+        this.ws.countSequenceSolvedToday() === 3
+      ) {
+        this.ss.updateSequenceStreak(true, date);
+      }
+      if (this.type() === 'daily') {
+        this.ss.updateDailyStreak(true, date);
+      }
     }
   }
 
@@ -277,8 +268,6 @@ export class WordGameComponent implements AfterViewInit {
       }
       return clone;
     });
-
-    console.log('sdufh sduf u sgfsduyl ', this.sequenceProgress());
 
     // Sauvegarde dans localStorage
     this.storage.saveDailySequence(this.sequenceProgress());
@@ -357,18 +346,240 @@ export class WordGameComponent implements AfterViewInit {
     setTimeout(() => this.hiddenInput()?.nativeElement.focus(), 10);
   }
 
-getMaskLetters(): string[] {
-  const letters = this.wordToFind()?.word.split('') || [];
-  const mask = Array(letters.length).fill('');
+  getMaskLetters(): string[] {
+    const letters = this.wordToFind()?.word.split('') || [];
+    const mask = Array(letters.length).fill('');
 
-  for (const attempt of this.dailyAttempts()) {
-    attempt.feedback.forEach((f: string, i: number) => {
-      if (f === 'green') {
-        mask[i] = attempt.guess[i].toUpperCase();
-      }
-    });
+    for (const attempt of this.dailyAttempts()) {
+      attempt.feedback.forEach((f: string, i: number) => {
+        if (f === 'green') {
+          mask[i] = attempt.guess[i].toUpperCase();
+        }
+      });
+    }
+
+    return mask;
   }
 
-  return mask;
-}
+  sts = inject(StorageService);
+
+  ggg() {
+    const streak = {
+      daily: {
+        bestStreak: 3,
+        currentStreak: 1,
+        lastSuccessDate: '2025-12-10',
+      },
+      sequence: {
+         bestStreak: 3,
+        currentStreak: 1,
+        lastSuccessDate: '2025-12-10',
+      },
+    };
+        const oldStreak = {
+
+        bestStreak: 3,
+        currentStreak: 2,
+        lastSuccessDate: '2025-12-10',
+    };
+    const dailySeq = {
+      '2025-12-09': {
+        solvedCount: 1,
+        attempts: {
+          '0': [
+            {
+              date: '2025-12-09',
+              guess: 'TINTE',
+              result: 'incorrect',
+              feedback: ['green', 'gray', 'gray', 'gray', 'yellow'],
+            },
+            {
+              date: '2025-12-09',
+              guess: 'TROUE',
+              result: 'incorrect',
+              feedback: ['green', 'yellow', 'gray', 'gray', 'yellow'],
+            },
+            {
+              date: '2025-12-09',
+              guess: 'TAPER',
+              result: 'incorrect',
+              feedback: ['green', 'green', 'gray', 'green', 'yellow'],
+            },
+            {
+              date: '2025-12-09',
+              guess: 'TARES',
+              result: 'correct',
+              feedback: ['green', 'green', 'green', 'green', 'green'],
+            },
+          ],
+          '1': [
+            {
+              date: '2025-12-09',
+              guess: 'ROUAGE',
+              result: 'incorrect',
+              feedback: ['green', 'gray', 'yellow', 'gray', 'gray', 'yellow'],
+            },
+            {
+              date: '2025-12-09',
+              guess: 'REPOSE',
+              result: 'incorrect',
+              feedback: ['green', 'green', 'gray', 'gray', 'yellow', 'gray'],
+            },
+          ],
+          '2': [],
+          '3': [],
+        },
+      },
+      '2025-12-11': {
+        solvedCount: 4,
+        attempts: {
+          '0': [
+            {
+              date: '2025-12-11',
+              guess: 'MOINS',
+              result: 'incorrect',
+              feedback: ['green', 'green', 'green', 'gray', 'gray'],
+            },
+            {
+              date: '2025-12-11',
+              guess: 'MOINE',
+              result: 'incorrect',
+              feedback: ['green', 'green', 'green', 'gray', 'green'],
+            },
+            {
+              date: '2025-12-11',
+              guess: 'MOITE',
+              result: 'correct',
+              feedback: ['green', 'green', 'green', 'green', 'green'],
+            },
+          ],
+          '1': [
+            {
+              date: '2025-12-11',
+              guess: 'PRENDS',
+              result: 'incorrect',
+              feedback: ['green', 'yellow', 'yellow', 'gray', 'gray', 'gray'],
+            },
+            {
+              date: '2025-12-11',
+              guess: 'PAROIS',
+              result: 'incorrect',
+              feedback: ['green', 'green', 'yellow', 'gray', 'gray', 'gray'],
+            },
+            {
+              date: '2025-12-11',
+              guess: 'PARLER',
+              result: 'incorrect',
+              feedback: ['green', 'green', 'gray', 'yellow', 'yellow', 'green'],
+            },
+            {
+              date: '2025-12-11',
+              guess: 'PALEUR',
+              result: 'correct',
+              feedback: ['green', 'green', 'green', 'green', 'green', 'green'],
+            },
+          ],
+          '2': [
+            {
+              date: '2025-12-11',
+              guess: 'DIANTRE',
+              result: 'incorrect',
+              feedback: [
+                'green',
+                'gray',
+                'gray',
+                'gray',
+                'gray',
+                'yellow',
+                'yellow',
+              ],
+            },
+            {
+              date: '2025-12-11',
+              guess: 'DRAINER',
+              result: 'incorrect',
+              feedback: [
+                'green',
+                'green',
+                'gray',
+                'gray',
+                'gray',
+                'green',
+                'green',
+              ],
+            },
+            {
+              date: '2025-12-11',
+              guess: 'DRUMMER',
+              result: 'correct',
+              feedback: [
+                'green',
+                'green',
+                'green',
+                'green',
+                'green',
+                'green',
+                'green',
+              ],
+            },
+          ],
+          '3': [
+            {
+              date: '2025-12-11',
+              guess: 'PARLOIRS',
+              result: 'correct',
+              feedback: [
+                'green',
+                'green',
+                'green',
+                'green',
+                'green',
+                'green',
+                'green',
+                'green',
+              ],
+            },
+          ],
+        },
+      },
+    };
+    const dailyAtt = {
+      '2025-12-11': [
+        {
+          date: '2025-12-11',
+          guess: 'CANARDEZ',
+          result: 'correct',
+          feedback: [
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+          ],
+        },
+      ],
+      '2025-12-10': [
+        {
+          date: '2025-12-10',
+          guess: 'CANARDEZ',
+          result: 'correct',
+          feedback: [
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+            'green',
+          ],
+        },
+      ],
+    };
+
+    this.sts.saveStreak(oldStreak);
+  }
 }
