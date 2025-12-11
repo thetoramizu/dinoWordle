@@ -64,10 +64,9 @@ h1 {
 .tab-underline {
   position: absolute;
   bottom: 0;
-  width: 50%;
   height: 3px;
   background: #0055ff;
-  transition: left 0.3s ease;
+  transition: left 0.3s ease, width 0.3s ease;
 }
 
 @media (max-width: 600px) {

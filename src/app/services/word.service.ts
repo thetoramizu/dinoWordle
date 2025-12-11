@@ -3,16 +3,23 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { WordOfDay } from '../models/word';
 import { StorageService } from './storage.service';
+import { Attempt } from '../models/attempt';
 
 @Injectable()
 export class WordService {
-  private readonly storageService = inject(StorageService)
+  private readonly storageService = inject(StorageService);
   private epoch = new Date('2024-01-01T00:00:00Z');
   words = signal<string[]>([]);
-  countSequenceSolvedToday = signal(0)
-    countSequenceSolvedTodayComputed = computed(() => {
-      return this.countSequenceSolvedToday() >=4 ? 3 : this.countSequenceSolvedToday()
-    })
+  allAttemptsInfinite = signal<Attempt[]>([]);
+
+
+  infiniteModeWord = signal<WordOfDay | null>(null);
+  countSequenceSolvedToday = signal(0);
+  countSequenceSolvedTodayComputed = computed(() => {
+    return this.countSequenceSolvedToday() >= 4
+      ? 3
+      : this.countSequenceSolvedToday();
+  });
 
   dailySequence = computed<WordOfDay[]>(() => {
     const words = this.words(); // ✅ lecture du signal
@@ -31,8 +38,7 @@ export class WordService {
   });
 
   constructor(private http: HttpClient) {
-    this.loadDailySequenceProgression()
-    // this.loadDictionary();
+    this.loadDailySequenceProgression();
   }
 
   // retourne la date au format YYYY-MM-DD
@@ -57,7 +63,7 @@ export class WordService {
   loadDictionary(): Promise<void> {
     // firstValueFrom remplace toPromise()
     return firstValueFrom(
-      this.http.get<string[]>('assets/dictionnaire.json')
+      this.http.get<string[]>('assets/dictionnaire-facile.json')
     ).then((data) => {
       this.words.set(data);
     });
@@ -160,11 +166,24 @@ export class WordService {
   }
 
   loadDailySequenceProgression() {
-    const date = new Date()
-    const currentState = this.storageService.loadDailySequence()
-    console.log( currentState[ this.yyyyMmDd(date)]);
-    const number = currentState[ this.yyyyMmDd(date)] ? currentState[ this.yyyyMmDd(date)].solvedCount : 0
-    console.log(number);
-    this.countSequenceSolvedToday.set(number)
+    const date = new Date();
+    const currentState = this.storageService.loadDailySequence();
+    const number = currentState[this.yyyyMmDd(date)]
+      ? currentState[this.yyyyMmDd(date)].solvedCount
+      : 0;
+    this.countSequenceSolvedToday.set(number);
+  }
+
+  getRandomWord(): void {
+    const list = this.words();
+    if (list && list.length > 0) {
+      const idx = Math.floor(Math.random() * list.length);
+
+      this.infiniteModeWord.set({
+        word: list[idx].toUpperCase(),
+        date: this.yyyyMmDd(new Date()),
+      });
+
+    }
   }
 }

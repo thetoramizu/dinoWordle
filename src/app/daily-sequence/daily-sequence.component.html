@@ -6,7 +6,7 @@
       <div class="sequence-title">Mots trouvés</div>
 
       <div class="sequence-list">
-        @for (word of listDailySequence().slice(0, ws.countSequenceSolvedToday()); track $index) {
+        @for (word of listDailySequence().slice(0, ws.countSequenceSolvedTodayComputed()); track $index) {
           <div class="sequence-item solved">
             {{ word.word.toUpperCase() }}
           </div>

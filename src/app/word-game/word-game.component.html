@@ -63,10 +63,23 @@
 
 
 @if (isLastCorrect() ) {
-
 <div class="victory-message">
+
+  @switch (type()) {
+  @case ('daily') {
   🎉 BRAVO ! Tu as trouvé le mot du jour !
+
+  } @case ('sequence') {
+  🎉 BRAVO ! Tu as trouvé le mot du jour !
+
+  } @case ('infinite') {
+  🎉 BRAVO ! Tu peux essayer un nouveau mot !
+
+  }
+
+  }
 </div>
+
 
 }
 

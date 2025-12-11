@@ -2,18 +2,16 @@
   <h1>Sumot Dino !</h1>
 
 
-  <div class="tabs-container">
+  <div class="tabs-container" #tabsContainer>
     <div class="tabs">
-      <button class="tab-btn" [class.active]="activeTab === 'daily'" (click)="activeTab = 'daily'">
-        Daily
+      @for(tab of tabs; let i = $index; track $index) {
+      <button class="tab-btn" [class.active]="activeTab === tab.key" (click)="activateTab(tab.key)">
+        {{ tab.label }}
       </button>
-
-      <button class="tab-btn" [class.active]="activeTab === 'sequence'" (click)="activeTab = 'sequence'">
-        Suite
-      </button>
+      }
     </div>
 
-    <div class="tab-underline" [style.left]="activeTab === 'daily' ? '0%' : '50%'"></div>
+    <div class="tab-underline" [style.left.px]="underlineLeft" [style.width.px]="underlineWidth"></div>
   </div>
 
   @switch (activeTab) {
@@ -31,33 +29,14 @@
   </app-daily-sequence>
   }
   }
+
+  @case ('infinite') {
+  @if (ws.infiniteModeWord(); as infiniteWord) {
+  <app-infinite-mode> </app-infinite-mode>
+  }
   }
 
-
-  <!-- @if(ws.wordOfDaySignal(); as dailyWord) {
- <app-word-game [type]="'daily'" [wordToFind]="dailyWord"></app-word-game>
-}
-
-
-
-  @if(ws.dailySequence(); as dailySequence) {
-  <app-daily-sequence [listDailySequence]="dailySequence"></app-daily-sequence>
-  } -->
-
-
-
-  <div class="daily">
-    <!-- <app-daily-word></app-daily-word> -->
-  </div>
-
-
-
-
-  <!-- <div class="card">
-    <app-sequence></app-sequence>
-  </div> -->
-
-
+  }
 
 
   <div class="card">

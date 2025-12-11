@@ -46,7 +46,6 @@ export class WordGameComponent implements AfterViewInit {
   private updatingInput = false;
 
   allAttempts = signal<any>(this.storage.loadAttempts());
-  // allAttempts = signal<any>(this.storage.loadDailySequence());
   allAttemptsSequence = signal<any>(this.storage.loadDailySequence());
 
   dailyAttempts = computed(() => {
@@ -56,8 +55,10 @@ export class WordGameComponent implements AfterViewInit {
           this.ws.countSequenceSolvedTodayComputed()
         ] || []
       );
-    } else {
+    } else if (this.type() === 'daily') {
       return this.allAttempts()[this.wordToFind()!.date] || [];
+    } else if (this.type() === 'infinite') {
+      return this.ws.allAttemptsInfinite() || [];
     }
   });
   canAttempt = computed(
@@ -177,6 +178,8 @@ export class WordGameComponent implements AfterViewInit {
 
     if (this.type() === 'sequence') {
       this.saveSequence();
+    } else if (this.type() === 'infinite') {
+      this.saveInfinite();
     } else if (this.type() === 'daily') {
       this.saveDaily();
     }
@@ -185,7 +188,6 @@ export class WordGameComponent implements AfterViewInit {
     this.typed = '';
     this.errorMessage.set('');
     this.focusInput();
-    console.log(this.isLastCorrect());
 
     if (this.type() === 'sequence' && this.isLastCorrect()) {
       const count = this.ws.countSequenceSolvedToday();
@@ -225,6 +227,7 @@ export class WordGameComponent implements AfterViewInit {
 
     //  Mettre à jour le signal allAttempts
     this.allAttempts.update((current) => {
+
       const clone = { ...current }; // clone de l'objet existant
       if (!clone[date]) clone[date] = []; // initialise le tableau si nécessaire
       clone[date] = [...clone[date], attempt]; // ajout immuable du nouvel attempt
@@ -272,6 +275,24 @@ export class WordGameComponent implements AfterViewInit {
     // Sauvegarde dans localStorage
     this.storage.saveDailySequence(this.sequenceProgress());
     this.allAttemptsSequence.set(this.sequenceProgress());
+  }
+
+  saveInfinite() {
+        const word = this.wordToFind();
+
+    const { feedback, correct } = this.ws.checkGuess(this.fullGuess, word.word);
+    const currentAttempts = this.ws.allAttemptsInfinite()
+
+    const attempt: Attempt = {
+      date: word.date,
+      guess: this.fullGuess.toUpperCase(),
+      result: correct ? 'correct' : 'incorrect',
+      feedback,
+    };
+
+        this.ws.allAttemptsInfinite.set([...currentAttempts, attempt]);
+
+
   }
 
   getLetters(attempt: any): string[] {
@@ -371,16 +392,15 @@ export class WordGameComponent implements AfterViewInit {
         lastSuccessDate: '2025-12-10',
       },
       sequence: {
-         bestStreak: 3,
+        bestStreak: 3,
         currentStreak: 1,
         lastSuccessDate: '2025-12-10',
       },
     };
-        const oldStreak = {
-
-        bestStreak: 3,
-        currentStreak: 2,
-        lastSuccessDate: '2025-12-10',
+    const oldStreak = {
+      bestStreak: 3,
+      currentStreak: 2,
+      lastSuccessDate: '2025-12-10',
     };
     const dailySeq = {
       '2025-12-09': {

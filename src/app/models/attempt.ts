@@ -1,5 +1,5 @@
 export interface Attempt {
-date: string;
+date?: string;
 guess: string;
 result: 'correct' | 'incorrect';
 feedback: Array<'green'|'yellow'|'gray'>;
