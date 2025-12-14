@@ -69,6 +69,7 @@ export class WordGameComponent implements AfterViewInit {
     [date: string]: {
       solvedCount: number;
       attempts: Record<number, Attempt[]>;
+      streakSaved?: boolean;
     };
   }>({});
 
@@ -78,9 +79,20 @@ export class WordGameComponent implements AfterViewInit {
 
   constructor() {
     effect(() => {
+      const w = this.wordToFind();
+      if (!w) return;
+
+      // 🔄 RESET COMPLET À CHAQUE NOUVEAU MOT
+      this.firstLetter = w.word[0].toUpperCase();
+      this.typed = '';
+      this.errorMessage.set('');
+      this.keyboardStates.set({});
+      this.focusInput();
+    });
+
+    effect(() => {
       this.allAttempts();
       this.allAttemptsSequence();
-
       this.updateKeyboardStates();
     });
     effect(() => {
@@ -178,6 +190,7 @@ export class WordGameComponent implements AfterViewInit {
 
     if (this.type() === 'sequence') {
       this.saveSequence();
+        this.checkEndOfSequenceAndSaveStreak(date);
     } else if (this.type() === 'infinite') {
       this.saveInfinite();
     } else if (this.type() === 'daily') {
@@ -197,17 +210,9 @@ export class WordGameComponent implements AfterViewInit {
       this.ws.countSequenceSolvedToday.set(count + 1);
     }
 
-    //  Mise à jour du streak si correct
-    if (correct) {
-      if (
-        this.type() === 'sequence' &&
-        this.ws.countSequenceSolvedToday() === 3
-      ) {
-        this.ss.updateSequenceStreak(true, date);
-      }
-      if (this.type() === 'daily') {
-        this.ss.updateDailyStreak(true, date);
-      }
+    //  Mise à jour du streak daily
+    if (this.type() === 'daily' && !this.canAttempt()) {
+      this.ss.updateDailyStreak(correct, date);
     }
   }
 
@@ -227,7 +232,6 @@ export class WordGameComponent implements AfterViewInit {
 
     //  Mettre à jour le signal allAttempts
     this.allAttempts.update((current) => {
-
       const clone = { ...current }; // clone de l'objet existant
       if (!clone[date]) clone[date] = []; // initialise le tableau si nécessaire
       clone[date] = [...clone[date], attempt]; // ajout immuable du nouvel attempt
@@ -278,10 +282,10 @@ export class WordGameComponent implements AfterViewInit {
   }
 
   saveInfinite() {
-        const word = this.wordToFind();
+    const word = this.wordToFind();
 
     const { feedback, correct } = this.ws.checkGuess(this.fullGuess, word.word);
-    const currentAttempts = this.ws.allAttemptsInfinite()
+    const currentAttempts = this.ws.allAttemptsInfinite();
 
     const attempt: Attempt = {
       date: word.date,
@@ -290,9 +294,7 @@ export class WordGameComponent implements AfterViewInit {
       feedback,
     };
 
-        this.ws.allAttemptsInfinite.set([...currentAttempts, attempt]);
-
-
+    this.ws.allAttemptsInfinite.set([...currentAttempts, attempt]);
   }
 
   getLetters(attempt: any): string[] {
@@ -380,6 +382,33 @@ export class WordGameComponent implements AfterViewInit {
     }
 
     return mask;
+  }
+
+  private checkEndOfSequenceAndSaveStreak(date: string) {
+    const progress = this.sequenceProgress()[date];
+    if (!progress) return;
+
+    const { solvedCount, attempts } = progress;
+
+    const currentIndex = solvedCount;
+    const attemptsOnCurrent = attempts[currentIndex] || [];
+
+    const MAX_GUESSES = this.maxGuesses;
+
+    const sequenceCompleted = solvedCount === 4;
+    const sequenceFailed =
+      !sequenceCompleted && attemptsOnCurrent.length >= MAX_GUESSES;
+
+    if (!sequenceCompleted && !sequenceFailed) return;
+
+    // 🔒 Sécurité : ne sauver qu'une fois
+    if (progress['streakSaved']) {
+      return;
+    }
+
+    progress['streakSaved'] = true;
+
+    this.ss.updateSequenceStreak(sequenceCompleted, date);
   }
 
   sts = inject(StorageService);
