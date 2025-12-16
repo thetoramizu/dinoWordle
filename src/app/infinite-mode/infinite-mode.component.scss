@@ -1,5 +1,5 @@
 .refresh-ghost {
-  background: rgba(0, 120, 255, 0.10);
+  background: var(--tab-active-bg);
   border: 1px solid rgba(0, 120, 255, 0.3);
   border-radius: 12px;
   padding: 10px 18px;
@@ -11,14 +11,13 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+  color: var(--tab-active-color);
+  transition: background 0.3s ease, color 0.3s ease;
 
   .icon {
     width: 16px;
     height: 16px;
     display: inline-flex;
-    color: rgba(0,120,255,0.7); /* discret mais visible */
+    color: var(--tab-active-color);
   }
-
-
-
 }

@@ -1,1 +1,82 @@
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  /* Light theme variables */
+  --bg-gradient-start: #f0f4ff;
+  --bg-gradient-end: #ffffff;
+  --text-color: #222;
+  --h1-gradient-start: #4f8bff;
+  --h1-gradient-end: #1b63e1;
+  --tab-border: #ddd;
+  --tab-color: #777;
+  --tab-active-color: #0055ff;
+  --tab-active-bg: rgba(0, 120, 255, 0.10);
+  --tab-shadow: rgba(0,0,0,0.12);
+  --card-bg: #fff;
+  --card-shadow: rgba(0,0,0,0.08);
+  --header-border: #d3d6da;
+  --header-title-color: #000;
+  --header-date-color: #565758;
+  --cell-bg: #ffffff;
+  --cell-color: #000;
+  --cell-border: #555;
+  --cell-fixed-bg: #ddd;
+  --cell-fixed-border: #333;
+  --victory-bg: #ffffff;
+  --victory-color: #388e3c;
+  --victory-border: #c0c0c0;
+  --victory-shadow: rgba(0, 0, 0, 0.05);
+  --key-border: #555;
+  --key-bg: #ffffff;
+  --key-color: #000;
+  --green: #30b267;
+  --yellow: #c8b450;
+  --gray: #5a5a5a;
+  --error-color: #e44;
+  --mask-color: rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme {
+  background-color: #0b0b41;
+  --bg-gradient-start: #0f1419;
+  --bg-gradient-end: #1a2332;
+  --text-color: #e8eaed;
+  --h1-gradient-start: #8ab4f8;
+  --h1-gradient-end: #5e97f6;
+  --tab-border: #374151;
+  --tab-color: #9ca3af;
+  --tab-active-color: #60a5fa;
+  --tab-active-bg: rgba(96, 165, 250, 0.12);
+  --tab-shadow: rgba(0,0,0,0.4);
+  --card-bg: #202124;
+  --card-shadow: rgba(0,0,0,0.35);
+  --header-border: #374151;
+  --header-title-color: #f9fafb;
+  --header-date-color: #d1d5db;
+  --cell-bg: #303134;
+  --cell-color: #f9fafb;
+  --cell-border: #5f6368;
+  --cell-fixed-bg: #3c4043;
+  --cell-fixed-border: #9ca3af;
+  --victory-bg: #202124;
+  --victory-color: #81c995;
+  --victory-border: #374151;
+  --victory-shadow: rgba(0, 0, 0, 0.35);
+  --key-border: #5f6368;
+  --key-bg: #303134;
+  --key-color: #f9fafb;
+  --error-color: #ea4335;
+  --mask-color: rgba(255, 255, 255, 0.15);
+}
+
+.light-theme {
+  /* Same as root, but explicit for clarity */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  transition: background 0.3s ease, color 0.3s ease;
+}

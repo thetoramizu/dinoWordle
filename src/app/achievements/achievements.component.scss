@@ -10,15 +10,16 @@
   margin-bottom: 20px;
   font-size: 1.6rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-color);
 }
 
 .card {
-  background: #f8f8f8; /* gris très clair */
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 8px var(--card-shadow);
+  border: 1px solid var(--tab-border);
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .section-title {
@@ -26,8 +27,8 @@
   font-weight: 500;
   margin-top: 18px;
   margin-bottom: 10px;
-  color: #444;
-  border-left: 4px solid #4e9cff;
+  color: var(--text-color);
+  border-left: 4px solid var(--h1-gradient-end);
   padding-left: 8px;
 }
 
@@ -40,8 +41,8 @@
   justify-content: space-between;
   padding: 8px 0;
   font-size: 1rem;
-  color: #555;
-  border-bottom: 1px solid #e3e3e3;
+  color: var(--header-date-color);
+  border-bottom: 1px solid var(--tab-border);
 }
 
 .row:last-of-type {

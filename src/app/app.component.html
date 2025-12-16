@@ -1,5 +1,10 @@
 <div class="app">
-  <h1>Sumot Dino !</h1>
+  <div class="header">
+    <h1>Sumot Dino !</h1>
+    <button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="themeService.isDarkMode() ? 'Passer en mode clair' : 'Passer en mode sombre'">
+      {{ themeService.isDarkMode() ? '☀️' : '🌙' }}
+    </button>
+  </div>
 
 
   <div class="tabs-container" #tabsContainer>
@@ -11,7 +16,7 @@
       }
     </div>
 
-    <div class="tab-underline" [style.left.px]="underlineLeft" [style.width.px]="underlineWidth"></div>
+    <div class="tab-underline" [style.left.px]="underlineLeft()" [style.width.px]="underlineWidth()"></div>
   </div>
 
   @switch (activeTab) {

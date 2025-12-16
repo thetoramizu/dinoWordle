@@ -23,7 +23,7 @@
   max-width: 8vw;
   height: 44px;
   border-radius: 4px;
-  border: 1px solid #555;
+  border: 1px solid var(--key-border);
   text-transform: uppercase;
   font-weight: bold;
   cursor: pointer;
@@ -34,6 +34,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: var(--key-bg);
+  color: var(--key-color);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Touches spéciales */
@@ -43,9 +46,9 @@
 }
 
 /* Couleurs */
-.key.green { background-color: #30b267; border-color: #30b267; color: white; }
-.key.yellow { background-color: #c8b450; border-color: #c8b450; color: white; }
-.key.gray { background-color: #5a5a5a; border-color: #5a5a5a; color: white; }
+.key.green { background-color: var(--green); border-color: var(--green); color: white; }
+.key.yellow { background-color: var(--yellow); border-color: var(--yellow); color: white; }
+.key.gray { background-color: var(--gray); border-color: var(--gray); color: white; }
 
 /* Petits écrans */
 @media (max-width: 400px) {
