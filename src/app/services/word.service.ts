@@ -10,7 +10,9 @@ export class WordService {
   private readonly storageService = inject(StorageService);
   private epoch = new Date('2024-01-01T00:00:00Z');
   words = signal<string[]>([]);
+  betaWords = signal<string[]>([]);
   allAttemptsInfinite = signal<Attempt[]>([]);
+  allAttemptsBeta = signal<Attempt[]>([]);
 
 
   infiniteModeWord = signal<WordOfDay | null>(null);
@@ -68,6 +70,23 @@ export class WordService {
       this.words.set(data);
     });
   }
+
+  /** Charge le dictionnaire depuis assets/dictionnaire.json */
+  loadBetaDictionary(): Promise<void> {
+    // firstValueFrom remplace toPromise()
+    return firstValueFrom(
+      this.http.get<string[]>('assets/dictionnaire-facile.json')
+    ).then((data) => {
+      this.betaWords.set(data);
+    });
+  }
+
+    getBetaWordOfDay(date = new Date()) {
+    const idx = this.getIndexFromDate(date, this.betaWords().length);
+
+    return { date: this.yyyyMmDd(date), word: this.betaWords()[idx].toUpperCase() };
+  }
+
 
   // getWordOfDay(date = new Date()){
   // const idx = this.daysSinceEpoch(date) % words.length;

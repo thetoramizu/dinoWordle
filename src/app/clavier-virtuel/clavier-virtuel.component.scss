@@ -39,12 +39,6 @@
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Touches spéciales */
-.key.Enter, .key.Backspace {
-  flex: 2 1 0;       /* plus large */
-  min-width: 50px;   /* minimum pour le texte */
-}
-
 /* Couleurs */
 .key.green { background-color: var(--green); border-color: var(--green); color: white; }
 .key.yellow { background-color: var(--yellow); border-color: var(--yellow); color: white; }
@@ -61,3 +55,4 @@
     min-width: 45px;
   }
 }
+

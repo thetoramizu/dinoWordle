@@ -1,13 +1,12 @@
 .achievements-container {
   max-width: 500px;
-  margin: 20px auto;
-  padding: 10px;
+  margin-bottom: 20px auto;
+  padding: 0 10px 10px 10px;
   font-family: system-ui, sans-serif;
 }
 
 .title {
   text-align: center;
-  margin-bottom: 20px;
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--text-color);

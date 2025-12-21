@@ -59,6 +59,8 @@ export class WordGameComponent implements AfterViewInit {
       return this.allAttempts()[this.wordToFind()!.date] || [];
     } else if (this.type() === 'infinite') {
       return this.ws.allAttemptsInfinite() || [];
+    } else if (this.type() === 'beta') {
+      return this.ws.allAttemptsBeta() || [];
     }
   });
   canAttempt = computed(
@@ -190,11 +192,13 @@ export class WordGameComponent implements AfterViewInit {
 
     if (this.type() === 'sequence') {
       this.saveSequence();
-        this.checkEndOfSequenceAndSaveStreak(date);
+      this.checkEndOfSequenceAndSaveStreak(date);
     } else if (this.type() === 'infinite') {
       this.saveInfinite();
     } else if (this.type() === 'daily') {
       this.saveDaily();
+    } else if (this.type() === 'beta') {
+      this.saveBeta();
     }
 
     // Réinitialiser la saisie
@@ -295,6 +299,22 @@ export class WordGameComponent implements AfterViewInit {
     };
 
     this.ws.allAttemptsInfinite.set([...currentAttempts, attempt]);
+  }
+
+  saveBeta() {
+    const word = this.wordToFind();
+
+    const { feedback, correct } = this.ws.checkGuess(this.fullGuess, word.word);
+    const currentAttempts = this.ws.allAttemptsBeta();
+
+    const attempt: Attempt = {
+      date: word.date,
+      guess: this.fullGuess.toUpperCase(),
+      result: correct ? 'correct' : 'incorrect',
+      feedback,
+    };
+
+    this.ws.allAttemptsBeta.set([...currentAttempts, attempt]);
   }
 
   getLetters(attempt: any): string[] {

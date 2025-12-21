@@ -44,7 +44,7 @@
     }
   </div>
 
-  <button (click)="submit()" [disabled]="fullGuess.length !== wordToFind()!.word.length">
+  <button (click)="submit()" class="btn-submit" [disabled]="fullGuess.length !== wordToFind()!.word.length">
     Proposer
   </button>
   }
@@ -70,15 +70,16 @@
   @switch (type()) {
   @case ('daily') {
   🎉 BRAVO ! Tu as trouvé le mot du jour !
-
   } @case ('sequence') {
   🎉 BRAVO ! Tu as trouvé la suite du jour !
 
   } @case ('infinite') {
   🎉 BRAVO ! Tu peux essayer un nouveau mot !
-
   }
 
+  @default {
+  🎉 BRAVO !
+  }
   }
 </div>
 

@@ -6,6 +6,7 @@ import { WordGameComponent } from './word-game/word-game.component';
 import { DailySequenceComponent } from './daily-sequence/daily-sequence.component';
 import { InfiniteModeComponent } from './infinite-mode/infinite-mode.component';
 import { ThemeService } from './services/theme.service';
+import { BetaListEasyComponent } from "./beta-list-easy/beta-list-easy.component";
 
 @Component({
   selector: 'app-root',
@@ -15,17 +16,19 @@ import { ThemeService } from './services/theme.service';
     DailySequenceComponent,
     WordGameComponent,
     InfiniteModeComponent,
-  ],
+    BetaListEasyComponent
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements AfterViewInit {
   title = 'Sumot';
-  activeTab: 'daily' | 'sequence' | 'infinite' = 'daily';
+  activeTab: 'daily' | 'sequence' | 'infinite' | 'beta' = 'daily';
   tabs = [
     { key: 'daily', label: 'Daily' },
     { key: 'sequence', label: 'Suite' },
     { key: 'infinite', label: 'Infini' },
+    { key: 'beta', label: 'Bêta' },
   ];
 
   protected readonly ws = inject(WordService);

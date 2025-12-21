@@ -174,3 +174,27 @@
   text-transform: uppercase;
   pointer-events: none; /* permet de taper par-dessus */
 }
+
+.btn-submit {
+  background: var(--tab-active-bg);
+  border: 1px solid rgba(0, 120, 255, 0.3);
+  border-radius: 12px;
+  padding: 10px 18px;
+  margin-top: 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--tab-active-color);
+  transition: background 0.3s ease, color 0.3s ease;
+
+  &:disabled{
+    background: var(--btn-disabled-bg);
+    color: var(--btn-disabled-color);
+    border-color: var(--btn-disabled-border);
+    cursor: not-allowed;
+  }
+}
